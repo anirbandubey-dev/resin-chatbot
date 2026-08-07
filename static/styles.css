@@ -1,0 +1,20 @@
+:root { color-scheme: dark; }
+.stApp { background: #0b1020; color: #e7ecf8; }
+[data-testid="stSidebar"] { background: #11182b; border-right: 1px solid #27324d; }
+[data-testid="stSidebar"] > div:first-child { padding: 1.5rem 1rem; }
+.brand { font-size: 1.45rem; font-weight: 750; letter-spacing: -0.04em; color: #f7f9ff; }
+.brand span { display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; margin-right: .55rem; border-radius: .55rem; background: linear-gradient(135deg, #7765ff, #35c5e8); font-size: 1rem; }
+.sidebar-footer { position: fixed; bottom: 1.7rem; color: #91a0bd; font-size: .78rem; line-height: 1.7; }
+.sidebar-footer b { color: #65d5a6; } .sidebar-footer small { color: #71809c; }
+[data-testid="stMainBlockContainer"] { max-width: 940px; padding-top: 2.7rem; padding-bottom: 7rem; }
+.welcome { text-align: center; margin: 17vh auto 2.2rem; max-width: 600px; }
+.welcome-icon { margin: auto auto 1rem; width: 3.25rem; height: 3.25rem; display: grid; place-items: center; border-radius: 1rem; background: linear-gradient(135deg, #7765ff, #35c5e8); font-size: 1.5rem; }
+.welcome h1 { margin: 0; color: #f6f8ff; font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -.06em; }
+.welcome p { color: #9dabc4; font-size: 1.05rem; }
+.suggestion { border: 1px solid #283451; border-radius: .75rem; padding: .9rem 1rem; color: #c1cbe0; background: #121a2d; font-size: .9rem; text-align: center; }
+[data-testid="stChatMessage"] { margin: .75rem 0; padding: 1rem; background: #11192b; border: 1px solid #26334e; border-radius: 1rem; }
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] { color: #e5ebf7; line-height: 1.65; }
+[data-testid="stChatInput"] { border: 1px solid #34425f; background: #161f33; border-radius: 1rem; box-shadow: 0 10px 28px rgba(0,0,0,.22); }
+[data-testid="stChatInput"] textarea { color: #f3f6ff; }
+.stButton > button { border-radius: .65rem; font-weight: 650; }
+@media (max-width: 760px) { [data-testid="stMainBlockContainer"] { padding: 1.25rem 1rem 6rem; } .welcome { margin-top: 10vh; } .sidebar-footer { position: static; margin-top: 2rem; } }

@@ -1,5 +1,6 @@
-"""Reusable Streamlit presentation components for SupportGPT."""
+"""Reusable Streamlit presentation components for Resin."""
 
+from html import escape
 from pathlib import Path
 from typing import Literal, cast
 
@@ -7,7 +8,8 @@ import streamlit as st
 import plotly.graph_objects as go
 
 from chatbot.models import ChatMessage
-from config import APP_ICON, APP_TITLE, PROJECT_ROOT
+from config import APP_ICON, APP_TITLE, PDF_DIRECTORY, PROJECT_ROOT
+from utils.state import get_user_name, set_user_name
 from database.analytics import AnalyticsDatabaseError, get_chat_analytics
 from database.database import ChatHistoryDatabaseError, FeedbackRating, get_feedback, save_feedback
 
@@ -25,30 +27,88 @@ def render_sidebar() -> Page:
     """Render primary navigation and return the selected destination."""
     with st.sidebar:
         st.markdown(f"<div class='brand'><span>{APP_ICON}</span>{APP_TITLE}</div>", unsafe_allow_html=True)
-        st.caption("AI customer support assistant")
-        if st.button("＋ New Chat", use_container_width=True, type="primary"):
+        st.caption("AI Assistant")
+        if st.button("＋ New chat", width="stretch", type="primary"):
             return "New Chat"
         st.divider()
         selection = st.radio("Workspace", _NAVIGATION_PAGES, label_visibility="collapsed")
         st.divider()
-        st.markdown("<div class='sidebar-footer'>● Service status: <b>Ready</b><br><small>Gemini 2.5 Flash</small></div>", unsafe_allow_html=True)
+        st.markdown("<div class='sidebar-footer'>● Service status: <b>Ready</b><br><small>Gemini • Online</small></div>", unsafe_allow_html=True)
     return cast(Page, selection)
 
 
 def render_empty_state() -> None:
-    """Display a useful welcome state before the first customer message."""
-    st.markdown("<section class='welcome'><div class='welcome-icon'>🤖</div><h1>How can I help today?</h1><p>Ask about orders, billing, account access, or a customer concern.</p></section>", unsafe_allow_html=True)
-    for column, text in zip(st.columns(3), ("Track an order", "Explain a charge", "Reset account access")):
-        column.markdown(f"<div class='suggestion'>{text}</div>", unsafe_allow_html=True)
+    """Render onboarding or a personalized welcome before the first message."""
+    user_name = get_user_name()
+    if not user_name:
+        st.markdown(
+            "<section class='welcome welcome-onboarding'>"
+            "<div class='welcome-icon'>👋</div>"
+            "<p class='eyebrow'>YOUR PERSONAL AI ASSISTANT</p>"
+            "<h1>Hello! Welcome to <span>Resin.</span></h1>"
+            "<p>Quick, reliable answers from your connected knowledge base.</p>"
+            "<div class='capabilities'><span>✦ Gemini AI</span><span>◉ RAG + FAISS</span><span>▣ PDF Knowledge Base</span></div>"
+            "</section>",
+            unsafe_allow_html=True,
+        )
+        with st.form("name_onboarding", clear_on_submit=True):
+            st.subheader("What should I call you?")
+            name = st.text_input(
+                "Your name",
+                placeholder="Enter your name...",
+                max_chars=60,
+                key="resin_name_input",
+                label_visibility="collapsed",
+            )
+            if st.form_submit_button("Continue →", type="primary", width="stretch"):
+                cleaned_name = name.strip()
+                if not cleaned_name:
+                    st.warning("Please enter your name to continue.")
+                elif len(cleaned_name) > 60:
+                    st.warning("Please use a name with 60 characters or fewer.")
+                else:
+                    set_user_name(cleaned_name)
+                    st.rerun()
+        return
+
+    st.markdown(
+        "<section class='welcome welcome-personalized'>"
+        "<div class='welcome-icon'>✦</div>"
+        f"<h1>👋 Welcome, <span>{escape(user_name)}.</span></h1>"
+        "<p>I'm Resin. How can I help you today?</p>"
+        "</section>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("<div class='suggestions-label'>Try one of these common topics</div>", unsafe_allow_html=True)
+    suggestions = (
+        ("📦", "Track an order", "Get help with orders and delivery questions."),
+        ("💳", "Explain a charge", "Understand billing and payment concerns."),
+        ("🔐", "Account support", "Get help with account access and common issues."),
+    )
+    for column, (icon, title, description) in zip(st.columns(3), suggestions):
+        column.markdown(
+            f"<div class='suggestion'><span class='suggestion-icon'>{icon}</span>"
+            f"<h3>{title}</h3><p>{description}</p></div>",
+            unsafe_allow_html=True,
+        )
 
 
 def render_message(message: ChatMessage) -> None:
-    """Render one timestamped conversation message as an accessible chat bubble."""
-    avatar = "🧑" if message["role"] == "user" else APP_ICON
-    with st.chat_message(message["role"], avatar=avatar):
+    """Render one Resin conversation message."""
+
+    is_user = message["role"] == "user"
+
+    avatar = "👤" if is_user else APP_ICON
+    with st.chat_message(
+        message["role"],
+        avatar=avatar,
+    ):
         st.markdown(message["content"])
-        st.caption(message["timestamp"])
-        if message["role"] == "assistant":
+
+        sender = "You" if is_user else "Resin"
+        st.caption(f"{sender} · {message['timestamp']}")
+
+        if not is_user:
             render_feedback_controls(message)
 
 
@@ -81,10 +141,18 @@ def _save_feedback(message: ChatMessage, rating: FeedbackRating) -> None:
 
 
 def render_knowledge_base() -> None:
-    """Render the Phase 1 knowledge-base readiness view."""
+    """Render the available PDFs used by the local knowledge base."""
+    pdf_files = sorted(PDF_DIRECTORY.glob("*.pdf"), key=lambda path: path.name.lower())
     st.title("Knowledge base")
-    st.caption("Trusted PDF retrieval will be available in a later phase.")
-    st.info("Add approved support documents to `data/pdfs/` to prepare them for indexing.")
+    st.caption("Documents available to Resin's local PDF retrieval system.")
+    st.metric("Available PDF documents", len(pdf_files))
+    if not pdf_files:
+        st.info("Add approved PDF documents to `data/pdfs/` to make them available for retrieval.")
+        return
+
+    st.subheader("Available documents")
+    for pdf_file in pdf_files:
+        st.markdown(f"<div class='document-row'>▣ <span>{pdf_file.name}</span></div>", unsafe_allow_html=True)
 
 
 def render_analytics() -> None:
@@ -140,7 +208,7 @@ def render_analytics() -> None:
 def render_settings() -> None:
     """Render secure Gemini configuration guidance."""
     st.title("Settings")
-    st.caption("Configure SupportGPT services without exposing credentials in the interface.")
+    st.caption("Configure Resin services without exposing credentials in the interface.")
     st.subheader("Gemini")
     st.code("GEMINI_API_KEY=your_api_key", language="bash")
     st.write("Store the key in `.env`, then restart the application.")

@@ -1,4 +1,4 @@
-"""Streamlit entry point for SupportGPT."""
+"""Streamlit entry point for Resin."""
 
 import logging
 
@@ -30,24 +30,24 @@ def render_chat() -> None:
     else:
         render_empty_state()
 
-    prompt = st.chat_input("Message SupportGPT…")
+    prompt = st.chat_input("Message Resin…")
     if not prompt:
         return
 
     context = messages[-MAX_HISTORY_MESSAGES:]
     render_message(add_message("user", prompt))
     with st.chat_message("assistant", avatar=APP_ICON):
-        with st.spinner("SupportGPT is thinking…"):
+        with st.spinner("Resin is thinking…"):
             try:
                 response = generate_response(prompt, context)
             except GeminiServiceError:
                 logger.warning("Gemini request could not be completed")
                 response = GEMINI_ERROR_MESSAGE
-                st.error("We couldn't connect to the support assistant. Please try again.")
+                st.error("Resin couldn't connect right now. Please try again.")
             except Exception:
                 logger.error("Unexpected chat response failure")
                 response = GEMINI_ERROR_MESSAGE
-                st.error("Something went wrong while processing your message. Please try again.")
+                st.error("Resin ran into a problem while processing your message. Please try again.")
         st.markdown(response)
     add_message("assistant", response)
 
@@ -65,7 +65,7 @@ def render_page(page: str) -> None:
 
 
 def main() -> None:
-    """Configure and run the SupportGPT Streamlit application."""
+    """Configure and run the Resin Streamlit application."""
     st.set_page_config(page_title=APP_TITLE, page_icon=APP_ICON, layout="wide", initial_sidebar_state="expanded")
     configure_logging()
     initialize_session()

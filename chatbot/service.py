@@ -5,8 +5,8 @@ from chatbot.models import ChatMessage
 
 
 class SupportAssistant:
-    """Delegate chat interface requests to the Gemini integration layer."""
+    """Delegate chat interface requests to the NVIDIA NIM integration layer."""
 
     def respond(self, prompt: str, history: list[ChatMessage]) -> str:
-        """Return a Gemini response while retaining the existing UI contract."""
+        """Return an NVIDIA NIM response while retaining the existing UI contract."""
         return generate_response(prompt, history)

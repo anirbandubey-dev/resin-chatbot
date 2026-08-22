@@ -1,13 +1,15 @@
 # SupportGPT – AI Customer Support Assistant
 
 SupportGPT is a modular Streamlit application for professional AI-assisted
-customer support. It includes a dark chat experience, Gemini 2.5 Flash,
+customer support. It includes a dark chat experience, NVIDIA NIM with
+DeepSeek-V4-Flash-0731, streamed responses,
 session-based conversation history, logging, and PDF-grounded retrieval.
 
 ## Requirements
 
 - Python 3.11+
-- A Gemini API key from Google AI Studio
+- An NVIDIA NIM API key from the NVIDIA API Catalog
+- The `deepseek-ai/deepseek-v4-flash-0731` model
 
 ## Setup
 
@@ -15,7 +17,8 @@ session-based conversation history, logging, and PDF-grounded retrieval.
 2. Install packages with `pip install -r requirements.txt`.
 3. Download the English spaCy model with `python -m spacy download en_core_web_sm`.
 4. Copy `.env.example` to `.env`.
-5. Set `GEMINI_API_KEY` in `.env`; never commit this file.
+5. Set `NVIDIA_NIM_API_KEY` in `.env`; never commit this file. The existing
+   `NVIDIA_NIMS_API_KEY` name is also supported for compatibility.
 6. Start SupportGPT with `streamlit run app.py`.
 
 Place approved PDF knowledge sources in `data/pdfs/`. SupportGPT automatically
@@ -25,10 +28,10 @@ creates or refreshes the local FAISS index when the source files change.
 
 - Responsive, dark ChatGPT-style Streamlit interface
 - Timestamped chat history in `st.session_state`
-- Gemini 2.5 Flash with a customer-support system instruction
-- A ten-message context window on every model request
+- DeepSeek-V4-Flash-0731 in low reasoning mode for low-latency professional support
+- A compact six-message context window with streamed responses
 - Safe, user-facing errors and application logs in `logs/supportgpt.log`
-- Semantic top-five PDF retrieval using PyPDF, LangChain, Sentence Transformers,
+- Semantic top-three PDF retrieval using PyPDF, LangChain, Sentence Transformers,
   and FAISS
 - SQLite-backed analytics for chat volume, response length, and frequent questions
 
@@ -36,7 +39,7 @@ creates or refreshes the local FAISS index when the source files change.
 
 ```text
 SupportGPT/
-├── chatbot/       # Gemini client, message domain model, compatibility service
+├── chatbot/       # NVIDIA NIM client, message domain model, compatibility service
 ├── database/      # SQLite persistence contracts (implementation deferred)
 ├── nlp/           # Text preprocessing contracts (implementation deferred)
 ├── vectorstore/   # PDF chunking, embeddings, and persistent FAISS retrieval

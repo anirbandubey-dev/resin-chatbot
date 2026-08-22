@@ -1,7 +1,7 @@
-from google import genai
-from config import GEMINI_API_KEY
+from openai import OpenAI
+from config import NVIDIA_NIM_API_KEY, NVIDIA_NIM_BASE_URL
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+client = OpenAI(api_key=NVIDIA_NIM_API_KEY, base_url=NVIDIA_NIM_BASE_URL)
 
-for model in client.models.list():
-    print(model.name)
+for model in client.models.list().data:
+    print(model.id)

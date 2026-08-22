@@ -4,8 +4,8 @@ import logging
 
 import streamlit as st
 
-from chatbot.chatbot import GeminiServiceError, generate_response
-from config import APP_ICON, APP_TITLE, GEMINI_ERROR_MESSAGE, MAX_HISTORY_MESSAGES
+from chatbot.chatbot import NIMServiceError, generate_response_stream
+from config import APP_ICON, APP_TITLE, MAX_HISTORY_MESSAGES, NIM_ERROR_MESSAGE
 from utils.logging_config import configure_logging
 from utils.state import add_message, clear_conversation, get_messages, initialize_session
 from utils.ui import (
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 def render_chat() -> None:
-    """Render history, collect a prompt, and append the Gemini response."""
+    """Render history, collect a prompt, and append the NVIDIA NIM response."""
     messages = get_messages()
     if messages:
         for message in messages:
@@ -37,18 +37,18 @@ def render_chat() -> None:
     context = messages[-MAX_HISTORY_MESSAGES:]
     render_message(add_message("user", prompt))
     with st.chat_message("assistant", avatar=APP_ICON):
-        with st.spinner("Resin is thinking…"):
-            try:
-                response = generate_response(prompt, context)
-            except GeminiServiceError:
-                logger.warning("Gemini request could not be completed")
-                response = GEMINI_ERROR_MESSAGE
-                st.error("Resin couldn't connect right now. Please try again.")
-            except Exception:
-                logger.error("Unexpected chat response failure")
-                response = GEMINI_ERROR_MESSAGE
-                st.error("Resin ran into a problem while processing your message. Please try again.")
-        st.markdown(response)
+        try:
+            response = st.write_stream(generate_response_stream(prompt, context))
+        except NIMServiceError:
+            logger.warning("NVIDIA NIM request could not be completed")
+            response = NIM_ERROR_MESSAGE
+            st.error("Resin couldn't connect right now. Please try again.")
+            st.markdown(response)
+        except Exception:
+            logger.exception("Unexpected chat response failure")
+            response = NIM_ERROR_MESSAGE
+            st.error("Resin ran into a problem while processing your message. Please try again.")
+            st.markdown(response)
     add_message("assistant", response)
 
 

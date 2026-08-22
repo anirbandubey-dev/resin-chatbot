@@ -165,7 +165,7 @@ def get_retriever() -> PDFRetriever:
 
 
 def retrieve_context(query: str, limit: int = RAG_TOP_K) -> str:
-    """Return formatted top-five PDF context or an empty string when unavailable."""
+    """Return formatted top-three PDF context or an empty string when unavailable."""
     try:
         chunks = get_retriever().retrieve(query, limit)
     except Exception as error:

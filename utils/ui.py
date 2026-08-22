@@ -8,7 +8,14 @@ import streamlit as st
 import plotly.graph_objects as go
 
 from chatbot.models import ChatMessage
-from config import APP_ICON, APP_TITLE, PDF_DIRECTORY, PROJECT_ROOT
+from config import (
+    APP_ICON,
+    APP_TITLE,
+    NVIDIA_NIM_MODEL,
+    NVIDIA_NIM_REASONING_EFFORT,
+    PDF_DIRECTORY,
+    PROJECT_ROOT,
+)
 from utils.state import get_user_name, set_user_name
 from database.analytics import AnalyticsDatabaseError, get_chat_analytics
 from database.database import ChatHistoryDatabaseError, FeedbackRating, get_feedback, save_feedback
@@ -33,7 +40,7 @@ def render_sidebar() -> Page:
         st.divider()
         selection = st.radio("Workspace", _NAVIGATION_PAGES, label_visibility="collapsed")
         st.divider()
-        st.markdown("<div class='sidebar-footer'>● Service status: <b>Ready</b><br><small>Gemini • Online</small></div>", unsafe_allow_html=True)
+        st.markdown("<div class='sidebar-footer'>● Service status: <b>Ready</b><br><small>NVIDIA NIM • Online</small></div>", unsafe_allow_html=True)
     return cast(Page, selection)
 
 
@@ -47,7 +54,7 @@ def render_empty_state() -> None:
             "<p class='eyebrow'>YOUR PERSONAL AI ASSISTANT</p>"
             "<h1>Hello! Welcome to <span>Resin.</span></h1>"
             "<p>Quick, reliable answers from your connected knowledge base.</p>"
-            "<div class='capabilities'><span>✦ Gemini AI</span><span>◉ RAG + FAISS</span><span>▣ PDF Knowledge Base</span></div>"
+            "<div class='capabilities'><span>✦ NVIDIA NIM AI</span><span>◉ RAG + FAISS</span><span>▣ PDF Knowledge Base</span></div>"
             "</section>",
             unsafe_allow_html=True,
         )
@@ -206,9 +213,10 @@ def render_analytics() -> None:
 
 
 def render_settings() -> None:
-    """Render secure Gemini configuration guidance."""
+    """Render secure NVIDIA NIM configuration guidance."""
     st.title("Settings")
     st.caption("Configure Resin services without exposing credentials in the interface.")
-    st.subheader("Gemini")
-    st.code("GEMINI_API_KEY=your_api_key", language="bash")
+    st.subheader("NVIDIA NIM")
+    st.caption(f"Model: `{NVIDIA_NIM_MODEL}` · Reasoning mode: `{NVIDIA_NIM_REASONING_EFFORT}` · Streaming: enabled")
+    st.code("NVIDIA_NIM_API_KEY=your_api_key", language="bash")
     st.write("Store the key in `.env`, then restart the application.")

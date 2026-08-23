@@ -13,7 +13,7 @@ APP_ICON: str = "🤖"
 
 NVIDIA_NIM_API_KEY: str | None = os.getenv("NVIDIA_NIM_API_KEY") or os.getenv("NVIDIA_NIMS_API_KEY")
 NVIDIA_NIM_BASE_URL: str = os.getenv("NVIDIA_NIM_BASE_URL", "https://integrate.api.nvidia.com/v1")
-NVIDIA_NIM_MODEL: str = os.getenv("NVIDIA_NIM_MODEL", "deepseek-ai/deepseek-v4-flash-0731")
+NVIDIA_NIM_MODEL: str = os.getenv("NVIDIA_NIM_MODEL", "meta/llama-3.1-8b-instruct")
 NVIDIA_NIM_TIMEOUT_SECONDS: float = float(os.getenv("NVIDIA_NIM_TIMEOUT_SECONDS", "60"))
 NVIDIA_NIM_MAX_RETRIES: int = int(os.getenv("NVIDIA_NIM_MAX_RETRIES", "0"))
 NVIDIA_NIM_MAX_TOKENS: int = int(os.getenv("NVIDIA_NIM_MAX_TOKENS", "512"))
